@@ -1,15 +1,28 @@
 {% extends 'default.html' %}
 
+<!--загрузка фильтра -->
+{% load custom_filters %}
+
 {% block content %}
     <h1>Все новости</h1>
+
+     <!-- Вывод общего количества новостей -->
+    <h3>Всего новостей на портале: {{ news|length }}</h3>
+
+    <h3>{{ time_now|date:'d M Y' }}</h3>
+   <!-- Если в переменной next_sale будет None,
+   то выведется указанный в фильтре текст -->
+   <!-- пока закоментировал, т.е. не прописал во views.py
+   <h3> {{ next_news|default_if_none:"Новостей пока нет!" }} </h3> -->
+
     <hr>
     {% if news %}
         {% for item in news %}
             <div>
                 <!-- Ссылка на отдельную новость по её id -->
-                <a href="{% url 'news_detail' item.id %}"><h3>{{ item.title }}</h3></a>
+                <a href="{% url 'news_detail' item.id %}"><h3>{{ item.title|censor }}</h3></a>
                 <p>{{ item.creation_time_date|date:'d.m.Y' }}</p>
-                <p>{{ item.preview }}</p>
+                <p>{{ item.text|censor|truncatewords:20 }}</p>
             </div>
         {% endfor %}
     {% else %}
