@@ -1,11 +1,14 @@
 {% extends 'default.html' %}
 
+<!--загрузка фильтра -->
+{% load custom_filters %}
+
 {% block content %}
-    <h1>{{ post.title }}</h1>
+    <h1>{{ post.title|censor }}</h1>
     <p>Дата публикации: {{ post.creation_time_date|date:'d.m.Y' }}</p>
     <hr>
     <div>
-        {{ post.text }}
+        {{ post.text|censor }}
     </div>
     <a href="{% url 'news_list' %}">Назад ко всем новостям</a>
 {% endblock %}

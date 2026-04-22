@@ -3,6 +3,7 @@ from datetime import datetime
 from django.contrib.auth.models import User
 from django.db.models import Sum
 from django.utils import timezone
+from django.urls import reverse #
 
 # Create your models here.
 
@@ -59,6 +60,9 @@ class Post(models.Model):
     def preview(self):
         return self.text[:124] + '...'
 
+    def get_absolute_url(self):
+        return reverse('news_detail', args=[str(self.id)]) #Чтобы после создания новости Django знал, куда перенаправить
+
 
 
 class PostCategory(models.Model): #промежуточная модель для связи многте ко многим
@@ -84,6 +88,6 @@ class Comment(models.Model):
 
 
 
-from django.db import models
 
-# Create your models here.
+
+
