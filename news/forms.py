@@ -10,14 +10,14 @@ class PostForm(forms.ModelForm):
             'author',
             'title',
             'text',
-            # Можно добавьте другие поля, если они есть в модели Post, при необходимости редактирования
+            # Добавьте другие поля, если они есть в вашей модели Post
         ]
 
     def clean(self):
         cleaned_data = super().clean()
         text = cleaned_data.get("text")
 
-        # Проверка на минимальное количество символов
+        # Проверка на минимальное количество символов (как в задании)
         if text is not None and len(text) < 20:
             raise ValidationError({
                 "text": "Текст статьи не может быть менее 20 символов."

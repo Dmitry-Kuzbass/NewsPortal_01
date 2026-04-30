@@ -1,6 +1,6 @@
 from django.shortcuts import render
 from django.urls import reverse_lazy # Импорт для перенаправления после действий
-from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
+from django.views.generic import ListView, DetailView, UpdateView, DeleteView, CreateView
 from .models import Post
 from .filters import PostFilter
 from .forms import PostForm # импорт формы!
@@ -42,6 +42,8 @@ class PostSearch(ListView):
         # Добавляем фильтр в контекст, чтобы вывести форму в шаблоне
         context['filterset'] = self.filterset
         return context
+
+# --- НОВЫЕ КЛАССЫ ДЛЯ CRUD ---
 
 # Представления для НОВОСТЕЙ (News)
 class NewsCreate(CreateView):

@@ -30,3 +30,4 @@ urlpatterns = [
     path('articles/<int:pk>/delete/', ArticleDelete.as_view(), name='article_delete'),
 
 ]
+
