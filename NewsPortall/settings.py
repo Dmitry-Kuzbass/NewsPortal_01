@@ -41,7 +41,24 @@ INSTALLED_APPS = [
     'django.contrib.sites',
     'django.contrib.flatpages',
     'django_filters',
+
+    'allauth',
+    'allauth.account',
+    'allauth.socialaccount',
+    'allauth.socialaccount.providers.yandex', # Провайдер яндекс
+
 ]
+
+# Настройки для социальных сетей
+SOCIALACCOUNT_PROVIDERS = {
+    'yandex': {
+        'SCOPE': [
+            'login:email',
+            'login:info',
+        ],
+        'AUTH_PARAMS': {'access_type': 'online'},
+    }
+}
 
 SITE_ID = 1
 
@@ -54,7 +71,12 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'django.contrib.flatpages.middleware.FlatpageFallbackMiddleware',
+
+    "allauth.account.middleware.AccountMiddleware",
 ]
+
+
+
 
 ROOT_URLCONF = 'NewsPortall.urls'
 
@@ -68,6 +90,7 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'django.template.context_processors.request',
             ],
         },
     },
@@ -121,4 +144,30 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/6.0/howto/static-files/
 
+
+# Письма будут печататься прямо в консоль (терминал) PyCharm для тестового тестирования, без привязки к реальной почты
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+
+
+ACCOUNT_AUTHENTICATION_METHOD = 'email'
+ACCOUNT_EMAIL_REQUIRED = True
+ACCOUNT_UNIQUE_EMAIL = True
+ACCOUNT_USERNAME_REQUIRED = False # Имя пользователя теперь необязательно
+ACCOUNT_EMAIL_VERIFICATION = 'mandatory' # Чтобы не настраивать почтовый сервер сразу (для тестов) добавил mandatory вместо none
+
 STATIC_URL = 'static/'
+
+LOGIN_URL = '/accounts/login/' # Куда слать анонима
+LOGIN_REDIRECT_URL = '/news/' # Адрес, на который пользователь попадет сразу после входа
+
+# Куда переходить после выхода из системы
+LOGOUT_REDIRECT_URL = '/news/'
+
+
+
+AUTHENTICATION_BACKENDS = [
+    'django.contrib.auth.backends.ModelBackend', # Стандартный вход по username
+    'allauth.account.auth_backends.AuthenticationBackend', # Вход через allauth (по почте)
+]
+
+ACCOUNT_FORMS = {'signup': 'news.forms.BasicSignupForm'}

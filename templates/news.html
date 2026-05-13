@@ -6,6 +6,16 @@
 {% block content %}
     <h1>Все новости</h1>
 
+
+    {# --- Кнопки создания (над списком) --- #}
+    {% if perms.news.add_post %}
+        <div style="margin-bottom: 20px;">
+            <a href="{% url 'news_create' %}" style="padding: 10px; background: #eee; border: 1px solid #ccc; text-decoration: none;">Добавить новость</a>
+            <a href="{% url 'article_create' %}" style="padding: 10px; background: #eee; border: 1px solid #ccc; text-decoration: none; margin-left: 10px;">Добавить статью</a>
+        </div>
+     {% endif %}
+
+
      <!-- Вывод общего количества новостей -->
     <h3>Всего новостей на портале: {{ page_obj.paginator.count }}</h3>
 
@@ -23,6 +33,18 @@
                 <a href="{% url 'news_detail' item.id %}"><h3>{{ item.title|censor }}</h3></a>
                 <p>{{ item.creation_time_date|date:'d.m.Y' }}</p>
                 <p>{{ item.text|censor|truncatechars:20 }}</p>
+
+
+                {# --- Кнопки редактирования и удаления (внутри цикла) --- #}
+                {% if perms.news.change_post %}
+                    <a href="{% url 'news_edit' item.id %}" style="color: orange; text-decoration: none;">Редактировать</a>
+                {% endif %}
+
+                {% if perms.news.delete_post %}
+                    <a href="{% url 'news_delete' item.id %}" style="color: red; text-decoration: none; margin-left: 15px;">Удалить</a>
+                {% endif %}
+
+
             </div>
         {% endfor %}
     {% else %}

@@ -2,6 +2,9 @@ from django import forms
 from django.core.exceptions import ValidationError
 from .models import Post
 
+# Добавляем нужные импорты для регистрации
+from django.contrib.auth.models import Group
+from allauth.account.forms import SignupForm
 
 class PostForm(forms.ModelForm):
     class Meta:
@@ -24,3 +27,16 @@ class PostForm(forms.ModelForm):
             })
 
         return cleaned_data
+
+
+# НОВАЯ ФОРМА ДЛЯ РЕГИСТРАЦИИ
+class BasicSignupForm(SignupForm):
+
+    def save(self, request):
+        # Сохраняем пользователя, как это делает стандартная форма allauth
+        user = super(BasicSignupForm, self).save(request)
+        # Находим группу common
+        basic_group = Group.objects.get(name='common')
+        # Добавляем пользователя в группу
+        basic_group.user_set.add(user)
+        return user

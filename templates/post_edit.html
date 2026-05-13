@@ -1,0 +1,14 @@
+{% extends 'default.html' %}
+
+{% block content %}
+    <h2>Редактирование новости/статьи</h2>
+    <hr>
+    <!-- Форма отправляет данные методом POST -->
+    <form action="" method="post">
+        {% csrf_token %} <!-- Защита Django от подделки запросов (обязательно!) -->
+
+        {{ form.as_p }} <!-- Выводит поля моей PostForm (заголовок, текст и т.д.) -->
+
+        <input type="submit" value="Сохранить изменения" />
+    </form>
+{% endblock %}
