@@ -1,0 +1,23 @@
+{% extends 'default.html' %}
+
+{% block content %}
+<div class="login-form" style="max-width: 400px; margin: 0 auto; padding: 20px;">
+    <h2>Вход в систему News Portal</h2>
+    <hr>
+
+    <!-- Форма отправляет данные на тот же URL методом POST -->
+    <form method="POST" action="{% url 'account_login' %}">
+        {% csrf_token %}
+
+        <!-- Вывод полей формы (Почта и Пароль) -->
+        {{ form.as_p }}
+
+        <button type="submit" style="width: 100%; padding: 10px; background-color: #007bff; color: white; border: none; border-radius: 5px;">
+            Войти
+        </button>
+    </form>
+
+    <hr>
+    <p>Нет аккаунта? <a href="{% url 'account_signup' %}">Зарегистрироваться</a></p>
+</div>
+{% endblock %}

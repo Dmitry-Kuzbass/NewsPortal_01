@@ -3,8 +3,10 @@ from .views import(
     NewsList, NewsDetail, PostSearch,
     NewsCreate, NewsUpdate, NewsDelete,
     ArticleCreate, ArticleUpdate, ArticleDelete,
-    upgrade_me
+    upgrade_me, subscribe
 )
+
+
 
 urlpatterns = [
     # Путь для списка новостей: /news/
@@ -31,6 +33,8 @@ urlpatterns = [
     path('articles/<int:pk>/delete/', ArticleDelete.as_view(), name='article_delete'),
     #
     path('upgrade/', upgrade_me, name='upgrade'),
+
+    path('categories/<int:pk>/subscribe/', subscribe, name='subscribe'),
 
 ]
 

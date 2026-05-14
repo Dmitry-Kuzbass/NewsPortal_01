@@ -83,14 +83,15 @@ ROOT_URLCONF = 'NewsPortall.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
+        # Указываем Django искать шаблоны в корневой папке templates
         'DIRS': [os.path.join(BASE_DIR, 'templates')],
-        'APP_DIRS': True,
+        'APP_DIRS': True,  # Это включает поиск шаблонов внутри allauth
         'OPTIONS': {
             'context_processors': [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
-                'django.template.context_processors.request',
+                'django.template.context_processors.request',  # Обязательно для allauth
             ],
         },
     },
@@ -149,11 +150,16 @@ USE_TZ = True
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 
 
-ACCOUNT_AUTHENTICATION_METHOD = 'email'
-ACCOUNT_EMAIL_REQUIRED = True
+#ACCOUNT_AUTHENTICATION_METHOD = 'email' # устаревшие названия настроек
+#ACCOUNT_EMAIL_REQUIRED = True # устаревшие названия настроек
 ACCOUNT_UNIQUE_EMAIL = True
-ACCOUNT_USERNAME_REQUIRED = False # Имя пользователя теперь необязательно
+#ACCOUNT_USERNAME_REQUIRED = False # Имя пользователя теперь необязательно устаревшие названия настроек
 ACCOUNT_EMAIL_VERIFICATION = 'mandatory' # Чтобы не настраивать почтовый сервер сразу (для тестов) добавил mandatory вместо none
+
+# добавил вместо закомиченых вверху
+ACCOUNT_LOGIN_METHODS = {'email'} # новые настройки для новой версии библиотеки django-allauth
+ACCOUNT_SIGNUP_FIELDS = ['email*', 'password1*', 'password2*'] # новые настройки для новой версии библиотеки django-allauth
+
 
 STATIC_URL = 'static/'
 

@@ -32,6 +32,22 @@
                 <!-- Ссылка на отдельную новость по её id -->
                 <a href="{% url 'news_detail' item.id %}"><h3>{{ item.title|censor }}</h3></a>
                 <p>{{ item.creation_time_date|date:'d.m.Y' }}</p>
+
+
+                <!-- Вывод категорий с кнопками подписки -->
+                <p>
+                    {% for category in item.categories.all %}
+                        <span style="font-size: 0.9em; margin-right: 10px;">
+                            #{{ category.name }}
+                            {% if user.is_authenticated and user not in category.subscribers.all %}
+                                <a href="{% url 'subscribe' category.id %}" style="color: #28a745; text-decoration: none; font-weight: bold; margin-left: 3px;">[+] Подписаться</a>
+                            {% elif user.is_authenticated %}
+                                <span style="color: #888;">(подписан)</span>
+                            {% endif %}
+                        </span>
+                    {% endfor %}
+                </p>
+
                 <p>{{ item.text|censor|truncatechars:20 }}</p>
 
 

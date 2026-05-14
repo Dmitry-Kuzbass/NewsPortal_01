@@ -1,13 +1,16 @@
 from django.shortcuts import render
 from django.urls import reverse_lazy # Импорт для перенаправления после действий
 from django.views.generic import ListView, DetailView, UpdateView, DeleteView, CreateView
-from .models import Post
+from .models import Post, Category
 from .filters import PostFilter
 from .forms import PostForm # импорт формы!
 from django.contrib.auth.mixins import PermissionRequiredMixin, LoginRequiredMixin #импорт миксина для проверки авторизации пользователя
 
 from django.shortcuts import redirect
 from django.contrib.auth.models import Group
+from django.contrib.auth.decorators import login_required
+
+from django.shortcuts import get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required
 # Create your views here.
 
@@ -112,3 +115,9 @@ def upgrade_me(request):
     if not request.user.groups.filter(name='authors').exists():
         authors_group.user_set.add(user)
     return redirect('news_list') # После нажатия вернем пользователя на главную
+
+@login_required # Подписаться могут только вошедшие пользователи
+def subscribe(request, pk):
+    category = get_object_or_404(Category, id=pk)
+    category.subscribers.add(request.user) # Добавляем юзера в ManyToMany поле
+    return redirect(request.META.get('HTTP_REFERER', '/news/')) # Возвращаем обратно

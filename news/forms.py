@@ -13,6 +13,7 @@ class PostForm(forms.ModelForm):
             'author',
             'title',
             'text',
+            'category',
             # Добавьте другие поля, если они есть в вашей модели Post
         ]
 
