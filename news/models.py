@@ -5,8 +5,9 @@ from django.db.models import Sum
 from django.utils import timezone
 from django.urls import reverse #
 from django.core.mail import EmailMultiAlternatives # Импортируем инструмент для HTML-писем
-from django.db.models.signals import m2m_changed, post_save
-from django.dispatch import receiver
+
+from allauth.account.signals import user_signed_up
+
 
 # Create your models here.
 
@@ -75,7 +76,7 @@ class Post(models.Model):
         return self.text[:124] + '...'
 
     def get_absolute_url(self):
-        return reverse('news_detail', args=[str(self.id)]) #Чтобы после создания новости Django знал, куда перенаправить
+        return reverse('news_detail', args=[str(self.id)]) #Чтобы после создания новости Django знал, куда перенаправить возвращает путь к новости
 
 
 
@@ -99,44 +100,6 @@ class Comment(models.Model):
         self.save()
 
 
-# Создаем функцию-обработчик сигнала изменения связей ManyToMany
-# ИЗМЕНЕНО: Теперь мы ловим сохранение строки (post_save) внутри таблицы PostCategory
-@receiver(post_save, sender=PostCategory)
-def notify_subscribers(sender, instance, created, **kwargs):
-
-    # Проверяем, что это именно создание новой связи, а не редактирование
-    if created:
-        # instance — это объект PostCategory.
-        # У него есть два поля: instance.post (сам пост) и instance.category (категория)
-        category = instance.category
-        post = instance.post
-
-        # Бежим по всем подписчикам этой конкретной категории
-        for user in category.subscribers.all():
-            if user.email:  # Проверяем, заполнена ли почта
-
-                subject = post.title
-
-                html_content = f"""
-                <h3>{post.title}</h3>
-                <p>{post.text[:50]}...</p>
-                <p>Здравствуй, {user.username}. Новая статья в твоём любимом разделе!</p>
-                """
-
-                text_content = f"{post.title}\n{post.text[:50]}...\nЗдравствуй, {user.username}. Новая статья в твоём любимом разделе!"
-
-                msg = EmailMultiAlternatives(
-                    subject=subject,
-                    body=text_content,
-                    from_email=None,
-                    to=[user.email]
-                )
-                msg.attach_alternative(html_content, "text/html")
-
-                msg.send()
 
 
 
-
-
-# Create your models here.

@@ -37,7 +37,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'news',
+    'news.apps.NewsConfig',
     'django.contrib.sites',
     'django.contrib.flatpages',
     'django_filters',
@@ -46,6 +46,9 @@ INSTALLED_APPS = [
     'allauth.account',
     'allauth.socialaccount',
     'allauth.socialaccount.providers.yandex', # Провайдер яндекс
+
+    # Добавляем планировщик задач:
+    'django_apscheduler',
 
 ]
 
@@ -146,19 +149,18 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/6.0/howto/static-files/
 
 
-# Письма будут печататься прямо в консоль (терминал) PyCharm для тестового тестирования, без привязки к реальной почты
-EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 
 
-#ACCOUNT_AUTHENTICATION_METHOD = 'email' # устаревшие названия настроек
-#ACCOUNT_EMAIL_REQUIRED = True # устаревшие названия настроек
+
+ACCOUNT_AUTHENTICATION_METHOD = 'email' # устаревшие названия настроек
+ACCOUNT_EMAIL_REQUIRED = True # устаревшие названия настроек
 ACCOUNT_UNIQUE_EMAIL = True
-#ACCOUNT_USERNAME_REQUIRED = False # Имя пользователя теперь необязательно устаревшие названия настроек
+ACCOUNT_USERNAME_REQUIRED = False # Имя пользователя теперь необязательно устаревшие названия настроек
 ACCOUNT_EMAIL_VERIFICATION = 'mandatory' # Чтобы не настраивать почтовый сервер сразу (для тестов) добавил mandatory вместо none
 
 # добавил вместо закомиченых вверху
-ACCOUNT_LOGIN_METHODS = {'email'} # новые настройки для новой версии библиотеки django-allauth
-ACCOUNT_SIGNUP_FIELDS = ['email*', 'password1*', 'password2*'] # новые настройки для новой версии библиотеки django-allauth
+#ACCOUNT_LOGIN_METHODS = {'email'} # новые настройки для новой версии библиотеки django-allauth
+#ACCOUNT_SIGNUP_FIELDS = ['email*', 'password1*', 'password2*'] # новые настройки для новой версии библиотеки django-allauth
 
 
 STATIC_URL = 'static/'
@@ -177,3 +179,24 @@ AUTHENTICATION_BACKENDS = [
 ]
 
 ACCOUNT_FORMS = {'signup': 'news.forms.BasicSignupForm'}
+
+# Письма будут печататься прямо в консоль (терминал) PyCharm для тестового тестирования, без привязки к реальной почты
+#EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+
+
+# settings.py (В самом конце файла)
+
+# 1. Переключаем Django из режима консоли в режим реальной отправки в интернет
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+
+# 2. Подключаем сетевой шлюз Яндекса
+EMAIL_HOST = 'smtp.yandex.ru'
+EMAIL_PORT = 465
+EMAIL_USE_SSL = True
+
+# 3. Данные ящика-робота, который вы настроили в Шаге 1
+EMAIL_HOST_USER = 'edv123evdokimov@yandex.ru'    # Почта вашего робота
+EMAIL_HOST_PASSWORD = 'itrsngndwpcmivti' # Пароль приложения вашего робота
+DEFAULT_FROM_EMAIL = 'edv123evdokimov@yandex.ru' # Имя отправителя в письме
+
+

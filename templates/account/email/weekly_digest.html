@@ -1,0 +1,32 @@
+<!-- templates/account/email/weekly_digest.html -->
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+</head>
+<body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;">
+    <h2>Привет! Вот новые статьи за прошедшую неделю в разделе "{{ category_name }}":</h2>
+    <hr>
+
+    <!-- Цикл перебирает все статьи, которые появились за 7 дней в этой категории -->
+    <ul>
+        {% for post in posts %}
+            <li style="margin-bottom: 15px;">
+                <!-- Выводим заголовок статьи как кликабельную синюю гиперссылку по ТЗ -->
+                <a href="{{ link }}{{ post.get_absolute_url }}" style="color: #007bff; font-weight: bold; text-decoration: none; font-size: 1.1em;">
+                    {{ post.title }}
+                </a>
+                <!-- Выводим краткое содержание (первые 50 символов) по ТЗ -->
+                <p style="margin: 5px 0 0 0; color: #666; font-size: 0.95em;">
+                    {{ post.text|truncatechars:50 }}
+                </p>
+            </li>
+        {% empty %}
+            <li>В этом разделе пока нет новых публикаций.</li>
+        {% endfor %}
+    </ul>
+
+    <hr>
+    <p style="font-size: 0.85em; color: #888;">Вы получили это письмо, так как подписаны на обновления категории "{{ category_name }}" на сайте News Portal.</p>
+</body>
+</html>
