@@ -110,6 +110,11 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
         'NAME': BASE_DIR / 'db.sqlite3',
+
+        # ИСПРАВЛЕНО: Добавляем таймаут внутрь существующего блока DATABASES
+        'OPTIONS': {
+            'timeout': 20,
+        }
     }
 }
 
@@ -194,9 +199,44 @@ EMAIL_HOST = 'smtp.yandex.ru'
 EMAIL_PORT = 465
 EMAIL_USE_SSL = True
 
-# 3. Данные ящика-робота, который вы настроили в Шаге 1
-EMAIL_HOST_USER = 'edv123evdokimov@yandex.ru'    # Почта вашего робота
-EMAIL_HOST_PASSWORD = 'itrsngndwpcmivti' # Пароль приложения вашего робота
+# 3. Данные ящика-робота, который настроили в Шаге 1
+EMAIL_HOST_USER = 'edv123evdokimov@yandex.ru'    # Почта моего робота
+EMAIL_HOST_PASSWORD = 'itrsngndwpcmivti' # Пароль приложения моего робота
 DEFAULT_FROM_EMAIL = 'edv123evdokimov@yandex.ru' # Имя отправителя в письме
 
 
+
+# settings.py (В самый конец файла)
+
+# Адрес подключения Django к запущенному Redis
+CELERY_BROKER_URL = 'redis://127.0.0.1:6379/0'
+CELERY_RESULT_BACKEND = 'redis://127.0.0.1:6379/0'
+
+
+# Настройки для Celery
+# settings.py (В самый конец файла)
+CELERY_ACCEPT_CONTENT = ['json']
+CELERY_TASK_SERIALIZER = 'json'
+CELERY_RESULT_SERIALIZER = 'json'
+CELERY_TIMEZONE = TIME_ZONE  # Синхронизируем часовой пояс с Django
+
+
+# Для еженедельной рассылки новостей по расписанию
+# settings.py (В самый конец файла)
+from celery.schedules import crontab  # Обязательный импорт планировщика
+
+# Настраиваем расписание периодических задач Celery Beat
+CELERY_BEAT_SCHEDULE = {
+    # Придумываем любое уникальное название для нашей задачи
+    'weekly_digest_every_monday_8am': {
+        # Указываем точный путь к нашей готовой задаче из файла tasks.py
+        'task': 'news.tasks.weekly_send_email_task',
+
+        # Настраиваем время запуска строго по ТЗ:
+        # day_of_week=1 означает Понедельник (в Celery: 1=Пн, 7=Вс)
+        # hour=8, minute=0 означает ровно 8:00 утра
+        'schedule': crontab(hour=8, minute=0, day_of_week=1),
+        #'schedule': crontab(minute='*/1'), # Запуск каждую минуту для теста!
+
+    },
+}

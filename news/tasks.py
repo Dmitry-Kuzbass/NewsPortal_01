@@ -1,39 +1,71 @@
 # news/tasks.py
 import datetime
-from django.conf import settings
+from celery import shared_task  # Обязательный импорт для Celery
 from django.core.mail import EmailMultiAlternatives
 from django.template.loader import render_to_string
 from django.utils import timezone
 from news.models import Post, Category
 
 
+# --- ЗАДАЧА 1: Моментальное уведомление о новом посте через Celery ---
+@shared_task
+def send_notifications_task(post_id):
+    try:
+        # Находим созданный пост по его ID
+        post = Post.objects.get(pk=post_id)
+
+        # Ссылка на статью (используем имя вашей главной папки с одной 'l' - NewsPortal)
+        full_url = f"http://127.0.0.1:8000{post.get_absolute_url()}"
+
+        # Бежим по категориям и их подписчикам
+        for category in post.category.all():
+            for user in category.subscribers.all():
+                if user.email:
+                    subject = post.title
+
+                    html_content = f"""
+                    <h3>{post.title}</h3>
+                    <p>{post.text[:50]}...</p>
+                    <p>Здравствуй, {user.username}. Новая статья в твоём любимом разделе!</p>
+                    <br>
+                    <p><a href="{full_url}">Перейти и прочитать статью полностью</a></p>
+                    """
+
+                    text_content = f"{post.title}\n{post.text[:50]}...\nЗдравствуй, {user.username}.\nЧитать: {full_url}"
+
+                    msg = EmailMultiAlternatives(
+                        subject=subject,
+                        body=text_content,
+                        from_email=None,
+                        to=[user.email]
+                    )
+                    msg.attach_alternative(html_content, "text/html")
+                    msg.send()
+
+    except Post.DoesNotExist:
+        pass
+
+
+# --- ЗАДАЧА 2: Еженедельная рассылка дайджеста новостей ---
+@shared_task
 def weekly_send_email_task():
-    # 1. Вычисляем дату, которая была ровно 7 дней назад
     today = timezone.now()
     last_week = today - datetime.timedelta(days=7)
-
-    # 2. Берем из базы данных все статьи, которые появились за эти 7 дней
     posts = Post.objects.filter(creation_time_date__gte=last_week)
 
-    # Если за неделю не было ни одной новой статьи — останавливаем работу, слать нечего
     if not posts.exists():
         return
 
-    # 3. Бежим по всем существующим категориям сайта
     categories = Category.objects.all()
     for category in categories:
-        # Фильтруем статьи за неделю: оставляем только те, что относятся к текущей категории
         category_posts = posts.filter(category=category)
 
-        # Если в этой категории появились статьи, и у неё есть подписчики
         if category_posts.exists() and category.subscribers.exists():
-            # Собираем список email-адресов всех подписчиков этой категории
             subscribers_emails = [user.email for user in category.subscribers.all() if user.email]
 
             if subscribers_emails:
                 subject = f"Еженедельный дайджест новых статей в разделе {category.name}"
 
-                # Рендерим HTML-шаблон письма, передавая в него список статей и имя категории
                 html_content = render_to_string(
                     'account/email/weekly_digest.html',
                     {
@@ -43,16 +75,13 @@ def weekly_send_email_task():
                     }
                 )
 
-                # Текстовая заглушка
-                text_content = f"Привет! Вот список новых статей за неделю в твоем любимом разделе {category.name}."
+                text_content = f"Привет! Вот список новых статей за неделю в твоем разделе {category.name}."
 
-                # Отправляем одно общее письмо сразу всему списку подписчиков (to=[])
-                # и скрываем их адреса друг от друга через bcc (скрытая копия)
                 msg = EmailMultiAlternatives(
                     subject=subject,
                     body=text_content,
                     from_email=None,
-                    bcc=subscribers_emails  # Скрытая копия для безопасности адресов
+                    bcc=subscribers_emails
                 )
                 msg.attach_alternative(html_content, "text/html")
                 msg.send()

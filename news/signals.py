@@ -1,55 +1,22 @@
 # news/signals.py
 from django.db.models.signals import post_save
 from django.dispatch import receiver
-from django.core.mail import EmailMultiAlternatives
+from django.db import transaction  # ИСПРАВЛЕНО: Импортируем модуль транзакций
+# Импортируем нашу новую фоновую задачу
+from news.tasks import send_notifications_task
 
 
 @receiver(post_save, sender='news.PostCategory')
 def notify_subscribers(sender, instance, created, **kwargs):
-
+    # Если в админке или на сайте успешно создалась связь новости с категорией
     if created:
+        # Берем ID только что созданного поста
+        post_id = instance.post.id
 
-        try:
-            from news.models import PostCategory, Category, Post
+        # ВНИМАНИЕ: Вызываем задачу через .delay().
+        # Это мгновенно бросает задачу в Redis и не тормозит работу сайта!
+        #send_notifications_task.delay(post_id)
 
-            category = instance.category
-            post = instance.post
-
-            # ШАГ 1: Собираем полную гиперссылку на статью
-            # post.get_absolute_url() вернет строку вида '/news/ID/'
-            # соединяем её с адресом локального сервера
-            full_url = f"http://127.0.0.1:8000{post.get_absolute_url()}"
-
-
-            for user in category.subscribers.all():
-
-                if user.email:
-                    subject = post.title
-
-                    # ШАГ 2: Внедряем гиперссылку в HTML-код письма
-                    html_content = f"""
-                    <h3>{post.title}</h3>
-                    <p>{post.text[:50]}...</p>
-                    <p>Здравствуй, {user.username}. Новая статья в твоём любимом разделе!</p>
-                    <br>
-                    <p><a href="{full_url}" style="background-color: #007bff; color: white; padding: 8px 15px; text-decoration: none; border-radius: 4px; display: inline-block;">
-                        Перейти и прочитать статью полностью
-                    </a></p>
-                    """
-
-                    # Для текстовой версии (без HTML) просто даем ссылку чистым текстом
-                    text_content = f"{post.title}\n{post.text[:50]}...\nЗдравствуй, {user.username}.\nПерейти к статье: {full_url}"
-
-
-                    msg = EmailMultiAlternatives(
-                        subject=subject,
-                        body=text_content,
-                        from_email=None,
-                        to=[user.email]
-                    )
-                    msg.attach_alternative(html_content, "text/html")
-                    msg.send()
-
-
-        except Exception as e:
-            print(f"❌ КРИТИЧЕСКАЯ ОШИБКА ВНУТРИ СИГНАЛА: {e}")
+        # ИСПРАВЛЕНО: Говорим Django вызвать Celery только ПОСЛЕ того,
+        # как база данных полностью запишет пост и разблокирует файл!
+        transaction.on_commit(lambda: send_notifications_task.delay(post_id))
