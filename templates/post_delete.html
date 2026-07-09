@@ -1,13 +1,17 @@
+{% load i18n %}
+
 html{% extends 'default.html' %}
 
 {% block content %}
-    <h2>Подтверждение удаления</h2>
+    <h2>{% trans "Подтверждение удаления" %}</h2>
     <hr>
     <form action="" method="post">
         {% csrf_token %}
-        <p>Вы действительно хотите удалить "{{ object.title }}"?</p>
+        <p>{% blocktrans %}Вы действительно хотите удалить "{{ object.title }}"?{% endblocktrans %}</p>
 
-        <input type="submit" value="Да, удалить" />
-        <a href="{% url 'news_list' %}">Отмена</a>
+        {% trans "Да, удалить" as my_delete_text %}
+
+        <input type="submit" value="{{ my_delete_text }}" />
+        <a href="{% url 'news_list' %}">{% trans "Отмена" %}</a>
     </form>
 {% endblock %}

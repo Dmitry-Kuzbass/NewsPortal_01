@@ -63,6 +63,7 @@ class Post(models.Model):
     title = models.CharField(max_length=255, verbose_name='Заголовок статьи/новости') #заголовок статьи, второй аргумент позволяет выводить вместо title Заголовок
     text = models.TextField(verbose_name='Текст статьи/новости')  #текст статьи
     rating = models.IntegerField(default=0) #рейтинг статьи
+    dateCreation = models.DateTimeField(auto_now_add=True)
 
     def like(self):
         self.rating += 1
@@ -78,7 +79,9 @@ class Post(models.Model):
     def get_absolute_url(self):
         return reverse('news_detail', args=[str(self.id)]) #Чтобы после создания новости Django знал, куда перенаправить возвращает путь к новости
 
-
+    # Вместо "Post object" выводим красивую строку: "06.07.2026 | Прекрасная новость"
+    def __str__(self):
+        return f"{self.dateCreation} | {self.title}"
 
 class PostCategory(models.Model): #промежуточная модель для связи многте ко многим
     post = models.ForeignKey(Post, on_delete=models.CASCADE)
@@ -99,7 +102,9 @@ class Comment(models.Model):
         self.rating -= 1
         self.save()
 
-
-
+    # Выводим, кто оставил комментарий и к какому посту
+    def __str__(self):
+        short_text = self.text[:20] + '...' if len(self.text) > 20 else self.text
+        return f"Комментарий от {self.author}: {short_text} (Рейтинг: {self.rating})"
 
 

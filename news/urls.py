@@ -1,4 +1,5 @@
 from django.urls import path
+from django.views.decorators.cache import cache_page  # ОБЯЗАТЕЛЬНО ДОБАВЬТЕ ЭТОТ ИМПОРТ НАВЕРХ!
 from .views import(
     NewsList, NewsDetail, PostSearch,
     NewsCreate, NewsUpdate, NewsDelete,
@@ -9,8 +10,8 @@ from .views import(
 
 
 urlpatterns = [
-    # Путь для списка новостей: /news/
-    path('', NewsList.as_view(), name='news_list'),
+    # Путь для списка новостей: /news/  — кэшируем на 1 минуту (60 секунд)
+    path('', cache_page(60)(NewsList.as_view()), name='news_list'),
     # Путь для одной новости: /news/<id>
     path('<int:pk>/', NewsDetail.as_view(), name='news_detail'),
     path('search/', PostSearch.as_view(), name='post_search'),

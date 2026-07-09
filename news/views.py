@@ -1,6 +1,7 @@
 from django.shortcuts import render
 from django.urls import reverse_lazy # Импорт для перенаправления после действий
 from django.views.generic import ListView, DetailView, UpdateView, DeleteView, CreateView
+from django.core.cache import cache  # ОБЯЗАТЕЛЬНЫЙ ИМПОРТ низкоуровневого кэша
 from .models import Post, Category
 from .filters import PostFilter
 from .forms import PostForm # импорт формы!
@@ -34,6 +35,21 @@ class NewsDetail(DetailView):
     model = Post
     template_name = 'post.html'
     context_object_name = 'post'
+
+    # Переопределяем метод получения объекта по заданию
+    def get_object(self, queryset=None):
+        # 1. Пробуем достать объект статьи из кэша Redis по уникальному ключу post-ID
+        obj = cache.get(f'post-{self.kwargs["pk"]}', None)
+
+        # 2. Если статьи в кэше нет (первый заход на страницу)
+        if not obj:
+            # Забираем статью штатно из базы данных SQLite
+            obj = super().get_object(queryset=queryset)
+            # Принудительно записываем её в кэш Redis. timeout=None означает "навсегда"
+            cache.set(f'post-{self.kwargs["pk"]}', obj, timeout=None)
+
+        # 3. Возвращаем объект (либо из кэша, либо свежий из базы)
+        return obj
 
 
 class PostSearch(ListView):

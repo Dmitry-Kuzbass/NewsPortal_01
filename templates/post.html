@@ -1,15 +1,17 @@
 {% extends 'default.html' %}
 
+{% load i18n %}
+
 <!--загрузка фильтра -->
 {% load custom_filters %}
 
 {% block content %}
     <h1>{{ post.title|censor }}</h1>
-    <p>Дата публикации: {{ post.creation_time_date|date:'d.m.Y' }}</p>
+    <p>{% trans "Дата публикации" %}: {{ post.creation_time_date|date:'d.m.Y' }}</p>
 
     <!-- (Блок категорий и кнопок подписки) -->
     <div style="margin: 10px 0; padding: 5px 0;">
-        <strong>Категории:</strong>
+        <strong>{% trans "Категории" %}:</strong>
         {% for category in post.category.all %}
             <span style="background-color: #f0f0f0; padding: 4px 10px; border-radius: 4px; margin-right: 10px; display: inline-block;">
                 {{ category.name }}
@@ -22,11 +24,11 @@
                         <form action="{% url 'subscribe' category.id %}" method="POST" style="display: inline; margin-left: 5px;">
                             {% csrf_token %}
                             <button type="submit" style="background-color: #28a745; color: white; border: none; padding: 2px 8px; border-radius: 3px; font-size: 0.85em; cursor: pointer;">
-                                Подписаться
+                                {% trans "Подписаться" %}
                             </button>
                         </form>
                     {% else %}
-                        <span style="color: green; font-size: 0.85em; margin-left: 5px; font-weight: bold;">(Вы подписаны)</span>
+                        <span style="color: green; font-size: 0.85em; margin-left: 5px; font-weight: bold;">({% trans "Вы подписаны" %})</span>
                     {% endif %}
 
                 {% endif %}
@@ -38,5 +40,5 @@
     <div>
         {{ post.text|censor }}
     </div>
-    <a href="{% url 'news_list' %}">Назад ко всем новостям</a>
+    <a href="{% url 'news_list' %}">{% trans "Назад ко всем новостям" %}</a>
 {% endblock %}

@@ -1,12 +1,17 @@
 {% extends 'default.html' %}
 
+{% load i18n %}
+
 {% block content %}
-    <h1>Поиск новостей</h1>
+    <h1>{% trans "Поиск новостей" %}</h1>
 
     {# Форма фильтрации #}
     <form action="" method="get">
         {{ filterset.form.as_p }}
-        <input type="submit" value="Найти" />
+
+        {% trans "Найти" as find %}
+
+        <input type="submit" value="{{find}}" />
     </form>
 
     <hr>
@@ -16,12 +21,12 @@
         {% for item in news %}
             <div>
                 <h3>{{ item.title }}</h3>
-                <p>Автор: {{ item.author }} | Дата: {{ item.creation_time_date|date:'d.m.Y' }}</p>
+                <p>{% blocktrans %}Автор: {{ item.author }} | Дата: {{ item.creation_time_date|date:'d.m.Y' }}{% endblocktrans %}</p>
                 <p>{{ item.text|truncatechars:20 }}</p>
             </div>
         {% endfor %}
     {% else %}
-        <h2>Новостей по таким критериям нет!</h2>
+        <h2>{% trans "Новостей по таким критериям нет!" %}</h2>
     {% endif %}
 
     {# Здесь можно добавить блок пагинации, как на основной странице #}

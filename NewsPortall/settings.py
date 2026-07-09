@@ -68,6 +68,10 @@ SITE_ID = 1
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+
+    # СЮДА ДОБАВЛЯЕМ СТРОЧКУ ПЕРЕВОДА:
+    'django.middleware.locale.LocaleMiddleware',
+
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
@@ -141,7 +145,7 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization
 # https://docs.djangoproject.com/en/6.0/topics/i18n/
 
-LANGUAGE_CODE = 'en-us'
+LANGUAGE_CODE = 'ru'
 
 TIME_ZONE = 'UTC'
 
@@ -150,10 +154,20 @@ USE_I18N = True
 USE_TZ = True
 
 
+
+
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/6.0/howto/static-files/
 
+LANGUAGES = [
+    ('ru', 'Русский'),
+    ('en', 'English'),
+]
 
+# Указываем Django, где искать нашу папку locale
+LOCALE_PATHS = [
+    BASE_DIR / 'locale'  # В новых версиях Django пишется так, это проще и без import os
+]
 
 
 
@@ -193,6 +207,10 @@ ACCOUNT_FORMS = {'signup': 'news.forms.BasicSignupForm'}
 
 # 1. Переключаем Django из режима консоли в режим реальной отправки в интернет
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+
+
+# для проверки почты прямо в jango
+#EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 
 # 2. Подключаем сетевой шлюз Яндекса
 EMAIL_HOST = 'smtp.yandex.ru'
@@ -240,3 +258,151 @@ CELERY_BEAT_SCHEDULE = {
 
     },
 }
+
+
+# Настройка кэша Django через сервер Redis
+CACHES = {
+    'default': {
+        'BACKEND': 'django.core.cache.backends.redis.RedisCache',
+        'LOCATION': 'redis://127.0.0.1:6379/1',  # Используем базу номер 1, чтобы не мешать Celery
+    }
+}
+
+# ==============================================================================
+# НАСТРОЙКА ЛОГИРОВАНИЯ (ИТОГОВОЕ ЗАДАНИЕ 4.1)
+# ==============================================================================
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+
+    # 1. ФИЛЬТРЫ (Условия, когда логи работают)
+    'filters': {
+        'require_debug_true': {
+            '()': 'django.utils.log.RequireDebugTrue',  # Работает только при DEBUG = True
+        },
+        'require_debug_false': {
+            '()': 'django.utils.log.RequireDebugFalse',  # Работает только при DEBUG = False
+        },
+    },
+
+    # 2. ФОРМАТТЕРЫ (Как выглядят строчки в файлах и консоли)
+    'formatters': {
+        'console_debug': {
+            'format': '{asctime} [{levelname}] {message}',
+            'style': '{',
+        },
+        'console_warning': {
+            'format': '{asctime} [{levelname}] {message} (Path: {pathname})',
+            'style': '{',
+        },
+        'file_general': {
+            'format': '{asctime} [{levelname}] In module "{module}": {message}',
+            'style': '{',
+        },
+        'file_errors': {
+            'format': '{asctime} [{levelname}] {message} (Path: {pathname})\nStack trace:\n{exc_info}',
+            'style': '{',
+        },
+        'file_security': {
+            'format': '{asctime} [{levelname}] In module "{module}": {message}',
+            'style': '{',
+        },
+        'mail_errors': {
+            'format': '{asctime} [{levelname}] {message} (Path: {pathname})',
+            'style': '{',
+        },
+    },
+
+    # 3. ХЕНДЛЕРЫ (Куда отправлять записи: в консоль, файлы или на почту)
+    'handlers': {
+        # Вывод в консоль для DEBUG сообщений
+        'console': {
+            'level': 'DEBUG',
+            'filters': ['require_debug_true'],  # Только при DEBUG = True
+            'class': 'logging.StreamHandler',
+            'formatter': 'console_debug',
+        },
+        # Отдельный хендлер для WARNING и выше в консоль (чтобы добавить pathname и exc_info)
+        'console_high': {
+            'level': 'WARNING',
+            'filters': ['require_debug_true'],
+            'class': 'logging.StreamHandler',
+            'formatter': 'console_warning',
+        },
+        # Файл общего назначения general.log
+        'file_general': {
+            'level': 'INFO',
+            'filters': ['require_debug_false'],  # Только при DEBUG = False
+            'class': 'logging.FileHandler',
+            'filename': BASE_DIR / 'general.log',
+            'formatter': 'file_general',
+        },
+        # Файл ошибок errors.log
+        'file_errors': {
+            'level': 'ERROR',
+            'class': 'logging.FileHandler',
+            'filename': BASE_DIR / 'errors.log',
+            'formatter': 'file_errors',
+        },
+        # Файл безопасности security.log
+        'file_security': {
+            'level': 'INFO',
+            'class': 'logging.FileHandler',
+            'filename': BASE_DIR / 'security.log',
+            'formatter': 'file_security',
+        },
+        # Отправка на почту администраторам
+        'mail_admins': {
+            'level': 'ERROR',
+            'filters': ['require_debug_false'],  # Только при DEBUG = False
+            'class': 'django.utils.log.AdminEmailHandler',
+            'formatter': 'mail_errors',
+        },
+    },
+
+    # 4. ЛОГГЕРЫ (Регистраторы, которые собирают события из разных частей Django)
+    'loggers': {
+        # Главный логгер django
+        'django': {
+            'handlers': ['console', 'console_high', 'file_general'],
+            'level': 'DEBUG',
+            'propagate': True,
+        },
+        # Ошибки запросов пользователей
+        'django.request': {
+            'handlers': ['file_errors', 'mail_admins'],
+            'level': 'ERROR',
+            'propagate': False,  # Выключаем дублирование в родительский логгер django
+        },
+        # Ошибки внутреннего сервера
+        'django.server': {
+            'handlers': ['file_errors', 'mail_admins'],
+            'level': 'ERROR',
+            'propagate': False,
+        },
+        # Ошибки в HTML-шаблонах
+        'django.template': {
+            'handlers': ['file_errors'],
+            'level': 'ERROR',
+            'propagate': False,
+        },
+        # Ошибки при работе с базой данных
+        'django.db.backends': {
+            'handlers': ['file_errors'],
+            'level': 'ERROR',
+            'propagate': False,
+        },
+        # Логгер безопасности
+        'django.security': {
+            'handlers': ['file_security'],
+            'level': 'INFO',
+            'propagate': False,
+        },
+    },
+}
+
+
+ADMINS = [
+    ('Дмитрий', 'edv123evdokimov@yandex.ru'), # Сюда Django будет слать письма об ошибках
+]

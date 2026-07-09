@@ -1,23 +1,25 @@
 {% extends 'default.html' %}
 
+# тег подключения перевода
+{% load i18n %}
 <!--загрузка фильтра -->
 {% load custom_filters %}
 
 {% block content %}
-    <h1>Все новости</h1>
+    <h1>{% trans "Все новости" %}</h1>
 
 
     {# --- Кнопки создания (над списком) --- #}
     {% if perms.news.add_post %}
         <div style="margin-bottom: 20px;">
-            <a href="{% url 'news_create' %}" style="padding: 10px; background: #eee; border: 1px solid #ccc; text-decoration: none;">Добавить новость</a>
-            <a href="{% url 'article_create' %}" style="padding: 10px; background: #eee; border: 1px solid #ccc; text-decoration: none; margin-left: 10px;">Добавить статью</a>
+            <a href="{% url 'news_create' %}" style="padding: 10px; background: #eee; border: 1px solid #ccc; text-decoration: none;">{% trans "Добавить новость" %}</a>
+            <a href="{% url 'article_create' %}" style="padding: 10px; background: #eee; border: 1px solid #ccc; text-decoration: none; margin-left: 10px;">{% trans "Добавить статью" %}</a>
         </div>
      {% endif %}
 
 
      <!-- Вывод общего количества новостей -->
-    <h3>Всего новостей на портале: {{ page_obj.paginator.count }}</h3>
+    <h3>{% trans "Всего новостей на портале" %}: {{ page_obj.paginator.count }}</h3>
 
     <h3>{{ time_now|date:'d M Y' }}</h3>
    <!-- Если в переменной next_sale будет None,
@@ -42,7 +44,7 @@
                             {% if user.is_authenticated and user not in category.subscribers.all %}
                                 <a href="{% url 'subscribe' category.id %}" style="color: #28a745; text-decoration: none; font-weight: bold; margin-left: 3px;">[+] Подписаться</a>
                             {% elif user.is_authenticated %}
-                                <span style="color: #888;">(подписан)</span>
+                                <span style="color: #888;">({% trans "подписан" %})</span>
                             {% endif %}
                         </span>
                     {% endfor %}
@@ -53,18 +55,18 @@
 
                 {# --- Кнопки редактирования и удаления (внутри цикла) --- #}
                 {% if perms.news.change_post %}
-                    <a href="{% url 'news_edit' item.id %}" style="color: orange; text-decoration: none;">Редактировать</a>
+                    <a href="{% url 'news_edit' item.id %}" style="color: orange; text-decoration: none;">{% trans "Редактировать" %}</a>
                 {% endif %}
 
                 {% if perms.news.delete_post %}
-                    <a href="{% url 'news_delete' item.id %}" style="color: red; text-decoration: none; margin-left: 15px;">Удалить</a>
+                    <a href="{% url 'news_delete' item.id %}" style="color: red; text-decoration: none; margin-left: 15px;">{% trans "Удалить" %}</a>
                 {% endif %}
 
 
             </div>
         {% endfor %}
     {% else %}
-        <h2>Новостей нет!</h2>
+        <h2>{% trans "Новостей нет!" %}</h2>
     {% endif %}
 
 {# --- Блок пагинации --- #}
@@ -73,8 +75,8 @@
         <div class="pagination">
             {# Ссылка на первую страницу #}
             {% if page_obj.has_previous %}
-                <a href="?page=1">« Первая</a>
-                <a href="?page={{ page_obj.previous_page_number }}">Назад</a>
+                <a href="?page=1">{% trans "« Первая" %}</a>
+                <a href="?page={{ page_obj.previous_page_number }}">{% trans "Назад" %}</a>
             {% endif %}
 
             {# Список ближайших страниц #}
@@ -90,8 +92,8 @@
 
             {# Ссылка на следующую и последнюю страницы #}
             {% if page_obj.has_next %}
-                <a href="?page={{ page_obj.next_page_number }}">Вперед</a>
-                <a href="?page={{ page_obj.paginator.num_pages }}">Последняя »</a>
+                <a href="?page={{ page_obj.next_page_number }}">{% trans "Вперед" %}</a>
+                <a href="?page={{ page_obj.paginator.num_pages }}">{% trans "Последняя »" %}</a>
             {% endif %}
         </div>
     {% endif %}

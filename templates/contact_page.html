@@ -1,3 +1,5 @@
+{% load i18n %}
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -7,7 +9,7 @@
 <body>
     <h2>{{ flatpage.title }}</h2>
     <hr>
-    <h3>Наши контакты:</h3>
+    <h3>{% trans "Наши контакты" %}:</h3>
     {{ flatpage.content }}
 </body>
 </html>

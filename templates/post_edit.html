@@ -1,7 +1,8 @@
-{% extends 'default.html' %}
+{% extends 'default.html' %} <!-- СТРОГО НА ПЕРВОЙ СТРОКЕ -->
+{% load i18n %}
 
 {% block content %}
-    <h2>Редактирование новости/статьи</h2>
+    <h2>{% trans "Редактирование новости/статьи" %}</h2>
     <hr>
     <!-- Форма отправляет данные методом POST -->
     <form action="" method="post">
@@ -9,6 +10,10 @@
 
         {{ form.as_p }} <!-- Выводит поля моей PostForm (заголовок, текст и т.д.) -->
 
-        <input type="submit" value="Сохранить изменения" />
+        <!-- ИСПРАВЛЕНО: соединили save_changes нижним подчеркиванием -->
+        {% trans "Сохранить изменения" as save_changes %}
+
+        <!-- ИСПРАВЛЕНО: подставили правильную переменную -->
+        <input type="submit" value="{{ save_changes }}" />
     </form>
 {% endblock %}

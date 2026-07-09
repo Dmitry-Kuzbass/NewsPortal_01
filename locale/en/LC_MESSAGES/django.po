@@ -1,0 +1,166 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-07-08 16:35+0700\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: .\templates\contact_page.html:12
+msgid "Наши контакты"
+msgstr "Our contact details"
+
+#: .\templates\default.html:22 .\templates\news.html:9
+msgid "Все новости"
+msgstr "All news"
+
+#: .\templates\default.html:23
+msgid "Поиск"
+msgstr "search"
+
+#: .\templates\default.html:28
+#, python-format
+msgid "Привет, %(user.username)s!"
+msgstr "Hello, %(user.username)s!"
+
+#: .\templates\default.html:32
+msgid "Стать автором!"
+msgstr "become an author"
+
+#: .\templates\default.html:36
+msgid "Выйти"
+msgstr "Log out"
+
+#: .\templates\default.html:39
+msgid "Войти через Яндекс"
+msgstr "Log in via Yandex"
+
+#: .\templates\default.html:41
+msgid "Войти"
+msgstr "Log in"
+
+#: .\templates\default.html:42
+msgid "Регистрация"
+msgstr "registration"
+
+#: .\templates\news.html:15
+msgid "Добавить новость"
+msgstr "Add news item"
+
+#: .\templates\news.html:16
+msgid "Добавить статью"
+msgstr "Add an article"
+
+#: .\templates\news.html:22
+msgid "Всего новостей на портале"
+msgstr "Total news items on the portal"
+
+#: .\templates\news.html:47
+msgid "подписан"
+msgstr "subscribed"
+
+#: .\templates\news.html:58
+msgid "Редактировать"
+msgstr "edit"
+
+#: .\templates\news.html:62
+msgid "Удалить"
+msgstr "delete"
+
+#: .\templates\news.html:69
+msgid "Новостей нет!"
+msgstr "There is no news"
+
+#: .\templates\news.html:78
+msgid "« Первая"
+msgstr "« first"
+
+#: .\templates\news.html:79
+msgid "Назад"
+msgstr "back"
+
+#: .\templates\news.html:95
+msgid "Вперед"
+msgstr "forward"
+
+#: .\templates\news.html:96
+msgid "Последняя »"
+msgstr "last »"
+
+#: .\templates\post.html:10
+msgid "Дата публикации"
+msgstr "publication date"
+
+#: .\templates\post.html:14
+msgid "Категории"
+msgstr "categories"
+
+#: .\templates\post.html:27
+msgid "Подписаться"
+msgstr "subscribe"
+
+#: .\templates\post.html:31
+msgid "Вы подписаны"
+msgstr "You are subscribed"
+
+#: .\templates\post.html:43
+msgid "Назад ко всем новостям"
+msgstr "Back to all news"
+
+#: .\templates\post_delete.html:6
+msgid "Подтверждение удаления"
+msgstr "deletion confirmation"
+
+#: .\templates\post_delete.html:10
+#, python-format
+msgid "Вы действительно хотите удалить \"%(object.title)s\"?"
+msgstr "Do you really want to delete \"%(object.title)s\"?"
+
+#: .\templates\post_delete.html:12
+msgid "Да, удалить"
+msgstr "Yes, delete"
+
+#: .\templates\post_delete.html:15
+msgid "Отмена"
+msgstr "cancel"
+
+#: .\templates\post_edit.html:6
+msgid "Редактирование новости/статьи"
+msgstr "Editing a news item/article"
+
+#: .\templates\post_edit.html:14
+msgid "Сохранить изменения"
+msgstr "Save changes"
+
+#: .\templates\search.html:6
+msgid "Поиск новостей"
+msgstr "News Search"
+
+#: .\templates\search.html:12
+msgid "Найти"
+msgstr "Find"
+
+#: .\templates\search.html:24
+#, python-format
+msgid "Автор: %(item.author)s | Дата: %(item.creation_time_date|date:'d.m.Y')s"
+msgstr "Author: %(item.author)s | Date: %(item.creation_time_date|date:'d.m.Y')s"
+
+#: .\templates\search.html:29
+msgid "Новостей по таким критериям нет!"
+msgstr "There is no news matching these criteria!"
+
+
+msgid "Привет"
+msgstr "Hello"
